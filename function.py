@@ -13,6 +13,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, ElementNotInteractableException
 import os
 import zipfile
+import pandas as pd
+from pymongo import MongoClient
+import os
+from datetime import datetime
+
 
 
 
@@ -126,5 +131,115 @@ def data_downloader(data_type, download_folder, extract_folder):
     
     # Close the browser
     driver.quit()
+
+
+#Mongodb
+
+
+# Replace with your MongoDB server's IP address, port, username, and password
+mongo_host = '3.109.41.82'
+mongo_port = 27017
+mongo_username = 'admin'
+mongo_password = '123456789'
+
+# Create a MongoDB client with authentication
+client = MongoClient(
+    host=mongo_host,
+    port=mongo_port,
+    username=mongo_username,
+    password=mongo_password
+)
+
+
+def insert_dataframe_to_mongodb(dataframe, database_name, collection_name):
+    # Create a MongoDB client with authentication
+    client = MongoClient(
+        host=mongo_host,
+        port=mongo_port,
+        username=mongo_username,
+        password=mongo_password
+    )
+    
+    # Access the specified database
+    db = client[database_name]
+    
+    # Access the specified collection
+    collection = db[collection_name]
+    
+    # Convert the DataFrame to a list of dictionaries
+    records = dataframe.to_dict(orient='records')
+    
+    # Insert the list of dictionaries into the collection
+    result = collection.insert_many(records)
+    return result
+
+
+def read_csvs_with_dates(folder_path, processed_files=set()):
+    dataframes = []  # List to store DataFrames
+    
+    # Iterate through files in the folder
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".csv") and filename not in processed_files:
+            print(filename)
+            file_path = os.path.join(folder_path, filename)
+            
+            # Extract the date from the file name
+            day_str = filename.split("_")[-1].replace(".csv", "")
+            mon_str=filename.split("_")[-2].replace(".csv", "")
+            yr_str=filename.split("_")[-3].replace(".csv", "")
+            date_str = yr_str+'-'+mon_str+'-'+day_str
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+            
+            # Read the CSV file into a DataFrame
+            df = pd.read_csv(file_path)
+            
+            # Add a "date" column with the extracted date
+            df.insert(0, "date", date_obj)
+            
+            # Append the DataFrame to the list
+            dataframes.append(df)
+            
+            # Add the filename to the set of processed files
+            processed_files.add(filename)
+    
+    return dataframes, processed_files  # Return the list of separate DataFrames and updated processed files set
+
+
+
+
+def get_dataframe_from_mongodb(database_name, collection_name, target_date=None):
+    # Create a MongoDB client with authentication
+    client = MongoClient(
+        host=mongo_host,
+        port=mongo_port,
+        username=mongo_username,
+        password=mongo_password
+    )
+    
+    # Access the specified database
+    db = client[database_name]
+    
+    # Access the specified collection
+    collection = db[collection_name]
+    
+    # Convert the target date to a datetime object if provided
+    if target_date:
+        target_date = datetime.strptime(target_date, '%Y-%m-%d')
+    
+    # Query to filter documents by the target date (if provided)
+    query = {}
+    if target_date:
+        query['date'] = target_date
+    
+    # Retrieve documents from the collection based on the query
+    cursor = collection.find(query)
+    
+    # Convert the cursor to a list of dictionaries
+    records = list(cursor)
+    
+    # Create a DataFrame from the list of dictionaries
+    dataframe = pd.DataFrame(records)
+    
+    return dataframe
 
 
