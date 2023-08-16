@@ -65,7 +65,10 @@ def data_downloader(data_type, download_folder, extract_folder):
         time.sleep(2)
         
         # Find the data div based on the data type
-        data_div_id = f'{data_type.lower()}SwapsData'
+        if data_type == 'Credits':
+            data_div_id='creditSwapsData'
+        else:
+            data_div_id = f'{data_type.lower()}SwapsData'
         data_swaps_div = driver.find_element(By.ID, data_div_id)
         
         # Find all rows in the table within the data_swaps_div
@@ -91,9 +94,10 @@ def data_downloader(data_type, download_folder, extract_folder):
                 # Click the download link
                 try:
                     WebDriverWait(driver, 2).until(EC.element_to_be_clickable(link)).click()
+                        # Wait for the browser to download the file
                     
                     # Wait for the browser to download the file
-                    time.sleep(15)  # Adjust the wait time based on your internet speed
+                    
                     
                     print(f"Downloaded: {filename}")
                     downloaded_files.add(filename)
@@ -101,6 +105,8 @@ def data_downloader(data_type, download_folder, extract_folder):
                     
                     # Extract the downloaded ZIP file to the specified folder
                     zip_path = os.path.join(download_folder, filename)
+                    while not os.path.exists(zip_path):
+                        time.sleep(5)
                     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                         zip_ref.extractall(extract_folder)
                     print(f"Extracted: {filename} to {extract_folder}")
