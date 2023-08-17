@@ -22,8 +22,17 @@ from datetime import datetime
 
 
 url = "https://pddata.dtcc.com/gtr/cftc/dashboard.do"
-response = requests.get(url)
-
+while True:
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            break  # Successful response, exit the loop
+        else:
+            print(f"Received status code: {response.status_code}. Retrying in 300 seconds...")
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}. Retrying in 300 seconds...")
+    
+    time.sleep(300)  # Wait for 300 seconds before retrying
 
 soup = BeautifulSoup(response.content, "html.parser")
 
@@ -59,7 +68,7 @@ def data_downloader(data_type, download_folder, extract_folder):
     time.sleep(2)
     
     downloaded_files = set()
-    
+    downloaded_files.update(os.listdir(download_folder))
     while True:
         # Click on the specified link
         link_partial_text = data_type
@@ -128,6 +137,7 @@ def data_downloader(data_type, download_folder, extract_folder):
         # Refresh the page to get the updated list of rows
         driver.refresh()
         time.sleep(5)  # Adjust the wait time based on the page's loading speed
+        downloaded_files.update(os.listdir(download_folder))
     
     # Close the browser
     driver.quit()
