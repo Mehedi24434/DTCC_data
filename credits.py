@@ -1,7 +1,7 @@
 import function as f
 database_name='DTCC'
 collection_name = 'credits'
-folder_path = '/home/mehedi/Documents/docker_influxdb/DTCC_data/extracted_files/Credits'
+folder_path = '/home/mehedi/Documents/docker_influxdb/DTCC_data/extract_files/Credits'
 processed_files = set()  # Initialize an empty set to store processed filenames
 resulting_dataframes, processed_files = f.read_csvs_with_dates(folder_path, processed_files)
 for df in resulting_dataframes:
