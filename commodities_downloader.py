@@ -1,8 +1,8 @@
 import dynamic_function as d
 import time
 data_type='Commodities' 
-download_folder= './dynamic_download'
-extract_folder= './test_extract/Commodities'
+download_folder= '/home/ec2-user/Documents/DTCC_data/downloads'
+extract_folder= '/home/ec2-user/Documents/DTCC_data/extracts/Commodities'
 while True:
     try:
         d.data_downloader(data_type, download_folder, extract_folder)

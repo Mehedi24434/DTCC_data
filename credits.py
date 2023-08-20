@@ -1,8 +1,8 @@
-import function as f
+import dynamic_function as d
 database_name='DTCC'
 collection_name = 'credits'
-folder_path = '/home/mehedi/Documents/docker_influxdb/DTCC_data/extract_files/Credits'
+folder_path = '/home/ec2-user/Documents/DTCC_data/extracts/Credits'
 processed_files = set()  # Initialize an empty set to store processed filenames
-resulting_dataframes, processed_files = f.read_csvs_with_dates(folder_path, processed_files)
+resulting_dataframes, processed_files = d.read_csvs_with_dates(folder_path, processed_files)
 for df in resulting_dataframes:
-    f.insert_dataframe_to_mongodb(df,  database_name,collection_name )
+    d.insert_dataframe_to_mongodb(df,  database_name,collection_name )
