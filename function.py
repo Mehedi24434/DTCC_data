@@ -51,16 +51,24 @@ iframe_src = iframe1['src']
 def data_downloader(data_type, download_folder, extract_folder):
     
     # Configure Chrome options and preferences
-    chrome_options = Options()
+    options = Options()
     chrome_prefs = {
         "download.default_directory": download_folder,
         "download.prompt_for_download": False,
         "download.directory_upgrade": True,
         "safebrowsing.enabled": True
     }
-    chrome_options.add_experimental_option("prefs", chrome_prefs)
+    options.add_experimental_option("prefs", chrome_prefs)
+    options.add_argument("--headless")
+    options.add_argument("window-size=1400,1500")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("start-maximized")
+    options.add_argument("enable-automation")
+    options.add_argument("--disable-infobars")
+    options.add_argument("--disable-dev-shm-usage")
     # Initialize Chrome driver with the configured options
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome(options=options)
     url = iframe_src
     driver.get(url)
     
