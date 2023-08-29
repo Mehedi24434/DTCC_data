@@ -1,4 +1,4 @@
 Host AWS
-  HostName ec2-13-233-73-197.ap-south-1.compute.amazonaws.com
-  IdentityFile /home/mehedi/Documents/docker_influxdb/DTCC_data/DTCC.pem
+  HostName ec2-3-111-57-199.ap-south-1.compute.amazonaws.com
+  IdentityFile /home/mehedi/Documents/docker_influxdb/DTCC_data/DTCC1.pem
   User ec2-user
